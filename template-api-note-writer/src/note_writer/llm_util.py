@@ -44,26 +44,37 @@ def get_claude_response(prompt: str, temperature: float = 0.7) -> str:
 
 def claude_describe_image(image_url: str, temperature: float = 0.0) -> str:
     """
-    Vision call (Claude 3 only).  **Requires** vision access in your Anthropic console.
-    """
-    return _anthropic_chat(
-        messages=[
-            {
-                "role": "user",
-                "content": [
-                    {"type": "image_url", "url": image_url},
-                    {
-                        "type": "text",
-                        "content": "Describe the image accurately and objectively.",
-                    },
-                ],
-            }
-        ],
-        model="claude-3-opus-20240229",   # any Claude‑3 model with vision works
-        max_tokens=256,
-        temperature=temperature,
-    )
+    Returns a plain‑text description of the image or "" if the call fails
+    (e.g. vision not enabled on the key).
 
+    Anthropic vision payload needs this shape:
+      {"type":"image_url","image_url":{"url": "<https://…>"}}
+    """
+    try:
+        return _anthropic_chat(
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "image_url",
+                            "image_url": { "url": image_url },
+                        },
+                        {
+                            "type": "text",
+                            "text": "Describe the image accurately and objectively.",
+                        },
+                    ],
+                }
+            ],
+            model=os.getenv("CLAUDE_VISION_ID", DEFAULT_MODEL),
+            max_tokens=256,
+            temperature=temperature,
+        )
+    except requests.HTTPError as e:
+        # Common causes: 400 Bad Request (vision not enabled) or 401 unauth.
+        print(f"[warn] vision call skipped for {image_url} → {e.response.status_code}")
+        return ""
 
 def get_claude_live_search_response(prompt: str, temperature: float = 0.7) -> str:
     """
