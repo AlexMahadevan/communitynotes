@@ -13,7 +13,7 @@ _HEADERS = {
 }
 
 
-def _anthropic_chat(messages, *, model="claude-3-sonnet-20240229",
+def _anthropic_chat(messages, *, model="claude-3-7-sonnet-20250219",
                     temperature=0.7, max_tokens=1024):
     """
     Minimal, blocking call to Anthropic Messages API.
