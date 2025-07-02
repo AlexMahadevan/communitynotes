@@ -5,6 +5,13 @@ import requests
 # Basic Anthropic wrapper
 ###########################################################################
 
+# ---------------------------------------------------------------
+# Base model IDs – override through env vars if you like.
+# ---------------------------------------------------------------
+DEFAULT_MODEL = os.getenv("CLAUDE_MODEL_ID", "claude-3-7-sonnet-20250219")
+VISION_MODEL  = os.getenv("CLAUDE_VISION_ID", DEFAULT_MODEL)
+
+
 _API_URL = "https://api.anthropic.com/v1/messages"
 _HEADERS = {
     "x-api-key": os.getenv("ANTHROPIC_API_KEY"),
